@@ -1,0 +1,303 @@
+{
+	"info": {
+		"_postman_id": "86e0988d-5c86-43b7-a2db-668ac24ad395",
+		"name": "Pudnik",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://ya.ru",
+					"protocol": "https",
+					"host": [
+						"ya",
+						"ru"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Createmeta",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var resBody = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Set Variable\", function () {\r",
+							"pm.environment.set(\"projectKey\", resBody.projects[1].key);\r",
+							"pm.environment.set(\"issueType\", resBody.projects[1].issuetypes[2].id);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/createmeta",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"createmeta"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CreateIssue",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var rnd = Math.random();\r",
+							"pm.environment.set(\"summary\", \"Pudnik1 - TestIssue_\" + rnd);\r",
+							"pm.environment.set(\"description\", \"задача\" + rnd);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"var resBody = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Set Isuue Id\", function () {\r",
+							"pm.environment.set(\"issueId\", resBody.id);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"fields\": {\r\n    \"project\": { \r\n      \"key\": \"{{projectKey}}\"\r\n    },\r\n    \"summary\": \"{{summary}}\",\r\n    \"description\": \"{{description}}\",\r\n    \"issuetype\": {\r\n      \"id\": \"{{issueType}}\"\r\n    }\r\n  }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{URL}}/{{issueId}}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var resBody = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Summary & Description Tests\", function () {\r",
+							"pm.expect(resBody.fields.summary).to.eql(pm.environment.get(\"summary\"));\r",
+							"pm.expect(resBody.fields.description).to.eql(pm.environment.get(\"description\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/{{issueId}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"{{issueId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{URL}}/{{issueId}}/transitions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var resBody = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status issue\", function () {\r",
+							"pm.environment.set(\"transitId\", resBody.transitions[1].id);\r",
+							"pm.environment.set(\"transitName\", resBody.transitions[1].name);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/{{issueId}}/transitions",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"{{issueId}}",
+						"transitions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{URL}}/{{issueId}}/transitions",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"transition\": {\r\n      \"id\": \"{{transitId}}\"\r\n    }\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/{{issueId}}/transitions",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"{{issueId}}",
+						"transitions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "{{URL}}/{{issueId}} forTransition",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var resBody = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Transit Tests\", function () {\r",
+							"pm.expect(resBody.fields.status.name).to.eql(pm.environment.get(\"transitName\"));\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/{{issueId}}",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"{{issueId}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "username",
+				"value": "deonis.81@mail.ru",
+				"type": "string"
+			},
+			{
+				"key": "password",
+				"value": "123456",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
